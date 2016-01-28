@@ -1,0 +1,29 @@
+
+all default: modules install
+
+external:
+	make -C $(KSRC) M=$(PWD)
+
+running:
+	make -C /lib/modules/`uname -r`/build M=$(PWD)
+
+run_install:
+	make -C /lib/modules/`uname -r`/build M=$(PWD) modules_install
+
+# if in ksrc/fs/sysv
+modules:
+	cd ../..; make modules SUBDIRS=fs/sysv
+
+install: unload copy load
+
+unload:
+	modprobe -r sysv
+
+copy:
+	cp sysv.ko /lib/modules/$(shell uname -r)/kernel/fs/sysv
+
+load:
+	modprobe sysv
+
+
+	
