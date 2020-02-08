@@ -206,7 +206,7 @@ int main(int argc, char **argv)
         /* cap inodes */
         if(n > 65500/NBINODE)
         {
-          printf("Too many inode blocks, %ld max\n", 65500/NBINODE );
+          printf("Too many inode blocks, %d max\n", 65500/NBINODE );
           n = 65500/NBINODE;
         }
      

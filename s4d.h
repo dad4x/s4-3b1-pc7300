@@ -595,10 +595,10 @@ typedef struct
 
 /* converting LBA to physical involves looking at bad block table */
 #define LBA_TO_VOL_PBA( d, lba ) \
-  s4_lba2pba( lba, (d)->bbt, (d)->nbb, (d)->lstrk )
+  s4_lba2pba( lba, (d)->bbt, (d)->nbb, (d)->lstrk, (d)->heads )
 
 #define LBA_TO_FS_PBA( xfs, lba ) \
-  s4_lba2pba( lba, (xfs)->bbt, (xfs)->nbb, (xfs)->vinfo->lstrk )
+  s4_lba2pba( lba, (xfs)->bbt, (xfs)->nbb, (xfs)->vinfo->lstrk, (xfs)->vinfo->heads )
 
 #define LBA_TO_VOL_OFFSET( d, lba ) \
   PBA_TO_OFFSET(d, LBA_TO_VOL_PBA( d, lba ))
@@ -678,7 +678,7 @@ s4err  s4_seek_write( int fd, int offset, char *buf, int blen );
 
 
 /* do bad block mapping given a bad block table and strk */
-int s4_lba2pba( int lba, struct s4_bbe *bbt, int nbb, int lstrk );
+int s4_lba2pba( int lba, struct s4_bbe *bbt, int nbb, int lstrk, int heads );
 
 /* reverse map physical block to lba.  FIXME - May not be useful. */
 int s4_pba2lba( int pba, struct s4_bbe *bbt, int nbb, int strk, int heads );
