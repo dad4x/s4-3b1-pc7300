@@ -1,3 +1,8 @@
+Fork
+====
+This is a fork of https://github.com/dad4x/s4-3b1-pc7300 with fixes
+to work with my images of 3b1 disk drives.
+
 Purpose
 =======
 

@@ -830,10 +830,12 @@ static void s4_vol_get_bbt( s4_vol *vinfo )
                       sizeof(vinfo->bbt_fsu.buf));
   if( s4_ok == rv )
     {
-      /* if bb turned off, go physical. */
+      /* if bb turned off, go physical. Don't do this for real disks with
+         17 sectors per track */
       printf("BBT CHKSUM %x\n", vinfo->bbt[0].cyl );
       if( vinfo->bbt[0].cyl == S4_NO_BB_CHECKSUM &&
-          vinfo->bbt[0].badblk == S4_NO_BB_CHECKSUM )
+          vinfo->bbt[0].badblk == S4_NO_BB_CHECKSUM &&
+          vinfo->pstrk != 17)
         {
           printf("PHYSICAL!\n");
           vinfo->lba_or_pba = s4a_pba;

@@ -13,6 +13,7 @@
 #endif
 
 #if __STDC_VERSION__ >= 199901L
+    #include <stdint.h>
 
     /* we have these automatically */
 
