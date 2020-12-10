@@ -2,7 +2,7 @@
 
 The files here have been updated to work on at least Ubuntu 18.04.
 To build it, you need the kernel headers. On my system, they're in
-`KSRC=/usr/src/linux-headers-5.4.0-56-generic`. To build the module, do:
+`/usr/src/linux-headers-5.4.0-56-generic`. To build the module, do:
 
     make -f Makefile.daveb KSRC=/usr/src/linux-headers-5.4.0-56-generic/ external
 
