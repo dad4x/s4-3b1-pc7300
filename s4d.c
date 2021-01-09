@@ -365,7 +365,7 @@ void s4dump( char *b, size_t len, int absolute, int width, int breaks )
 
 
 
-int s4_lba2pba( int lba, s4_bbt *bbt, int nbb, int lstrk )
+int s4_lba2pba( int lba, s4_bbt *bbt, int nbb, int lstrk, int heads )
 {
   int pba = lba + (lba/(lstrk)); /* one spare sector per track */
   int npba;
@@ -376,28 +376,34 @@ int s4_lba2pba( int lba, s4_bbt *bbt, int nbb, int lstrk )
       int hdsec = lba % lstrk;
       int i, cylsec;
       
-      for( i = 0 ; i < nbb ; i++ )
+      /* First entry is checksum so start at 1 */
+      for( i = 1 ; i < nbb ; i++ )
         {
-          cylsec = bbt[i].cyl;
+          cylsec = bbt[i].badblk + bbt[i].cyl * heads * (lstrk + 1);
           if( !cylsec )
             break;
 
           if( track == (cylsec / (lstrk+1)) && hdsec == (cylsec % (lstrk+1)) )
             {
-              npba = (track * (lstrk+1)) + 16;
+              /* Badblk is alternate track, convert to block. Last sector on
+                 track is alternate */
+              npba = bbt[i].altblk * (lstrk + 1) + lstrk;
 
-              printf("Mapping lba %d from pba %d to %d. BB cyl %d trk %d hdsec %d\n",
-                     lba, pba, npba, cylsec, track, hdsec );
+              printf("Mapping lba %d from pba %d to %d.\n",
+                     lba, pba, npba );
 
+              pba = npba;
               break;
             }
         }
     }
+
   return pba;
 }
 
 
 
+/* strk is physical sectors per track */
 int s4_pba2lba( int pba, struct s4_bbe *bbt, int nbb, int strk, int heads )
 {
   int lba   = pba - (pba/strk);
@@ -409,15 +415,18 @@ int s4_pba2lba( int pba, struct s4_bbe *bbt, int nbb, int strk, int heads )
       if( nbb )
         {
           int track = pba / strk;
-          int i, cylsec;
+          int i;
 
-          for( i = 0; i < nbb ; i++ )
+          /* First entry is checksum so start at 1 */
+          for( i = 1; i < nbb ; i++ )
             {
-              cylsec = bbt[i].cyl;
-              if( track == (cylsec/strk) )
+              /* If track is alternate block location map to bad sector
+                 location */
+              if( track == bbt[i].altblk ) 
                 {
-                  /* this is almost certainly wrong: test & FIXME */
-                  lba = (track * (strk-1)) + ((cylsec % strk) % heads);
+                  /* Convert remapped sector to pba then lba */
+                  lba = bbt[i].cyl * heads * strk + bbt[i].badblk;
+                  lba = lba - (lba / strk);
                 }
             }
         }
@@ -427,7 +436,6 @@ int s4_pba2lba( int pba, struct s4_bbe *bbt, int nbb, int strk, int heads )
         }
     }
   
-
   return lba;
 }
 
@@ -822,10 +830,12 @@ static void s4_vol_get_bbt( s4_vol *vinfo )
                       sizeof(vinfo->bbt_fsu.buf));
   if( s4_ok == rv )
     {
-      /* if bb turned off, go physical. */
+      /* if bb turned off, go physical. Don't do this for real disks with
+         17 sectors per track */
       printf("BBT CHKSUM %x\n", vinfo->bbt[0].cyl );
       if( vinfo->bbt[0].cyl == S4_NO_BB_CHECKSUM &&
-          vinfo->bbt[0].badblk == S4_NO_BB_CHECKSUM )
+          vinfo->bbt[0].badblk == S4_NO_BB_CHECKSUM &&
+          vinfo->pstrk != 17)
         {
           printf("PHYSICAL!\n");
           vinfo->lba_or_pba = s4a_pba;
@@ -1294,6 +1304,7 @@ void s4_fsu_swap( s4_fsu *fsu, int btype )
         for( i = 0; i < S4_NBB && fsu->bbt[ i ].cyl ; i++ )
           {
             fsu->bbt[ i ].cyl    = s4swaph( fsu->bbt[ i ].cyl );
+            fsu->bbt[ i ].badblk = s4swaph( fsu->bbt[ i ].badblk );
             fsu->bbt[ i ].altblk = s4swaph( fsu->bbt[ i ].altblk );
             fsu->bbt[ i ].nxtind = s4swaph( fsu->bbt[ i ].nxtind );
           }
@@ -1670,8 +1681,8 @@ static void s4_vol_bbt_show( s4_vol *vinfo )
     {
       printf("Bad Block table at blk %d sum 0x%x %d entries\n",
              vinfo->bbt_ba, vinfo->bbt[0].cyl, vinfo->nbb );
-      printf(" Cyl  cylsec  trk  sec     cyl sector nxt\n");
-      printf("----  ------  ---  ---    ---- ------ ---\n");
+      printf(" Cyl  cylsec  head  sec     cyl  head  nxt\n");
+      printf("----  ------  ----  ---     ---  ----  ---\n");
 
       /* first entry is the checksum; ignore */
       bbe = &vinfo->bbt[1];
@@ -1683,13 +1694,13 @@ static void s4_vol_bbt_show( s4_vol *vinfo )
           cylsec = bbe->badblk;
           altblk = bbe->altblk;
 
-          printf("%4d: %6d  %4d %3d ->%5d %6d %3d\n",
+          printf("%4d: %6d  %4d %4d -> %4d %5d %4d\n",
                  bbe->cyl,
                  cylsec,
                  cylsec / vinfo->pstrk,
                  cylsec % vinfo->pstrk,
-                 cylsec / vinfo->pstrk,
-                 altblk,
+                 altblk / vinfo->heads,
+                 altblk % vinfo->heads,
                  bbe->nxtind );
         }
       printf("%d bad blocks\n\n", i);

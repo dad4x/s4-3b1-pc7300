@@ -241,6 +241,8 @@ int main( int argc, char **argv )
         case afblk:
           fblk   = curadr;
           lbar   = fblk * 2;
+          break;
+
         default:
           printf("oops\n");
           abort();

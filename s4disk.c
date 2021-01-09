@@ -165,7 +165,7 @@ static void s4_steal_vol_header( s4_vol *vinfo )
 {
   FILE *fp;
   char  nbuf[ 80 ];
-  char  fnbuf[ 80 ];
+  char  fnbuf[ 84 ];
   char  ebuf[ 1024 ];           /* encoded */
   char  pbuf[ 1024 ];           /* plain back from encoding */
   int   elen, plen;
