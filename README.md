@@ -3,6 +3,13 @@ Fork
 This is a fork of https://github.com/dad4x/s4-3b1-pc7300 with fixes
 to work with my images of 3b1 disk drives.
 
+A fork of my fork is at 
+https://github.com/arnoldrobbins/s4-3b1-pc7300/ that the sysv driver has been
+updated to work with Ubuntu 18.04.
+
+
+Rest of this is the original readme.
+
 Purpose
 =======
 
