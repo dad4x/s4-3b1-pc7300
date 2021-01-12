@@ -36,7 +36,7 @@
 #include <signal.h>
 #include <time.h>
 #include <unistd.h>
-#include <ustat.h>
+#include <sys/vfs.h>
 
 #define	SBSIZE	512
 
@@ -1452,16 +1452,8 @@ int setup( char *dev )
 				 * which means we can't check pipedev */
   s4_off smapsz, lncntsz, totsz;
 
-  struct ustat ustatarea;
+  struct statfs statfsarea;
 
-#if 0  
-  struct {
-    s4_daddr	tfree;
-    s4_ino	tinode;
-    char	fname[6];
-    char	fpack[6];
-  } ustatarea;
-#endif
   struct stat statarea;
 
   if(stat("/",&statarea) < 0)
@@ -1476,7 +1468,7 @@ int setup( char *dev )
   if((statarea.st_mode & S_IFMT) == S_IFBLK) {
     if(rootdev == statarea.st_rdev)
       hotroot++;
-    else if(ustat(statarea.st_rdev,&ustatarea) >= 0) {
+    else if(statfs(dev,&statfsarea) >= 0) {
       if(!nflag) {
         error3("%c %s%s is a mounted file system, ignored\n",
               id,devname,dev);
