@@ -36,7 +36,8 @@
 #include <signal.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/vfs.h>
+
+#include "ismounted.h"
 
 #define	SBSIZE	512
 
@@ -1452,8 +1453,6 @@ int setup( char *dev )
 				 * which means we can't check pipedev */
   s4_off smapsz, lncntsz, totsz;
 
-  struct statfs statfsarea;
-
   struct stat statarea;
 
   if(stat("/",&statarea) < 0)
@@ -1468,7 +1467,7 @@ int setup( char *dev )
   if((statarea.st_mode & S_IFMT) == S_IFBLK) {
     if(rootdev == statarea.st_rdev)
       hotroot++;
-    else if(statfs(dev,&statfsarea) >= 0) {
+    else if(ismounted(dev)) {
       if(!nflag) {
         error3("%c %s%s is a mounted file system, ignored\n",
               id,devname,dev);
@@ -1484,6 +1483,13 @@ int setup( char *dev )
   }
   else if((statarea.st_mode & S_IFMT) == S_IFCHR)
     rawflg++;
+  else if(ismounted(dev)) {	/* loop mounted */
+    if(!nflag) {
+      error3("%c %s%s is a mounted file system, ignored\n",
+            id,devname,dev);
+      return(NO);
+    }
+  }
 #if 0
   else {
     error("%c %s%s is not a block or character device\n",id,devname,dev);

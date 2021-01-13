@@ -69,8 +69,8 @@ $(S4EXPORT):  s4export.o $(LIB)
 $(S4FS):    s4fs.o $(LIB)
 	    $(CC) s4fs.o $(LIBOPTS) -o $@
 
-$(S4FSCK):  s4fsck.o $(LIB)
-	    $(CC) s4fsck.o $(LIBOPTS) -o $@
+$(S4FSCK):  s4fsck.o  ismounted.o $(LIB)
+	    $(CC) s4fsck.o ismounted.o $(LIBOPTS) -o $@
 
 $(S4IMPORT):  s4import.o $(LIB)
 	    $(CC) s4import.o $(LIBOPTS) -o $@
