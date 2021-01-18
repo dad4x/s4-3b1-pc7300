@@ -20,6 +20,13 @@ Note also that when creating files on a mounted System V filesystem,
 Linux will *not* truncate file names for you; you must keep
 filenames to 14 characters or less.
 
+A fork of my fork is at 
+https://github.com/arnoldrobbins/s4-3b1-pc7300/ that the sysv driver has been
+updated to work with Ubuntu 18.04.
+
+
+Rest of this is the original readme.
+
 Purpose
 =======
 
