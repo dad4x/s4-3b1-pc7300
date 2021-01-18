@@ -1,6 +1,10 @@
 /*
  * ismounted.c --- check if a device is mounted.
  * Linux specific.
+ *
+ * Arnold Robbins
+ * arnold@skeeve.com
+ * January, 2021.
  */
 
 #include <stdio.h>
@@ -60,6 +64,7 @@ ismounted(const char *device)
 		}
 
 		if (strcmp(device, entry->mnt_fsname) == 0) {
+			(void) endmntent(fp);
 			return true;
 		}
 
@@ -68,6 +73,7 @@ ismounted(const char *device)
 		}
 
 		if (is_underlying_file(& statbuf, entry->mnt_fsname + 5)) {
+			(void) endmntent(fp);
 			return true;
 		}
 	}
