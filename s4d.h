@@ -69,7 +69,7 @@
 #define S4_HD_FS_PNUM     (2)
 
 /* ---------------------------------------------------------------- */
-/* replacing <sys/params.h */
+/* replacing sys/param.h */
 
 #define S4_ROOTINO      2
 #define	S4_NICFREE	50    /* number of superblock free blocks */
@@ -85,7 +85,7 @@ typedef int32_t    s4_daddr;
 typedef uint16_t   s4_ino;
 typedef int32_t    s4_off;
 typedef int32_t    s4_time;
-typedef int32_t    s4_dev;
+typedef int16_t    s4_dev;
 
 /* ---------------------------------------------------------------- */
 /* replace sys/gdisk.h */
@@ -138,7 +138,7 @@ struct s4_bbe {
                                    within the cylinder cyl */
   uint16_t	altblk;		/* track number of alternate */
   uint16_t	nxtind;		/* index into the cell array for next bad block
-r0st				   cell for this cylinder */
+				   cell for this cylinder */
 };
 
 #define S4_MNAMSZ	40		/* max length of name including null terminator */
@@ -156,8 +156,8 @@ struct s4_resdes {		/* reserved area special files */
 
 /*	volume home block on disk	*/
 struct  s4_vhbd {
-	uint	magic;		/* S4 disk format code */
-	int	chksum;		/* adjustment so that the 32 bit sum starting
+	uint32_t	magic;		/* S4 disk format code */
+	int32_t		chksum;		/* adjustment so that the 32 bit sum starting
 				   from magic for 512 bytes sums to -1 */
 	struct s4_dswprt dsk;	/* specific description of this disk */
 	struct s4_partit partab[S4_MAXSLICE];	/* partition table */
@@ -172,11 +172,11 @@ struct  s4_vhbd {
 	char	fpulled;	/* dismounted last time? */
         char    pad;		/* dbrower 2016 */
 
-        /* this 8 slices * 40 = 500 bytes!? */
+        /* this 16 slices * 40 = 640 bytes! */
 	struct	s4_mntnam mntname[S4_MAXSLICE];	/* names for auto mounting.
 			  		   null string means no auto mount */
-	int	time;		/* time last came on line */
-	short	cpioMagic,	/* for cpio backup, restore	*/
+	int32_t	time;		/* time last came on line */
+	int16_t	cpioMagic,	/* for cpio backup, restore	*/
 		setMagic,
 		cpioVol;
 } __attribute__((__packed__));
@@ -240,16 +240,16 @@ struct	s4_dfilsys
 {
 	uint16_t	 s_isize;	/* size in blocks of i-list */
 	s4_daddr s_fsize;	/* size in blocks of entire volume */
-	short	 s_nfree;	/* number of addresses in s_free */
+	int16_t	 s_nfree;	/* number of addresses in s_free */
 	s4_daddr s_free[S4_NICFREE];	/* free block list */
-	short	 s_ninode;	/* number of i-nodes in s_inode */
+	int16_t	 s_ninode;	/* number of i-nodes in s_inode */
 	s4_ino	 s_inode[S4_NICINOD];	/* free i-node list */
 	char	 s_flock;	/* lock during free list manipulation */
 	char	 s_ilock;	/* lock during i-list manipulation */
 	char  	 s_fmod; 	/* super block modified flag */
 	char	 s_ronly;	/* mounted read-only flag */
-        int32_t	 s_time; 	/* last super block update */
-	short	 s_vinfo[4];	/* device information */
+	s4_time	 s_time; 	/* last super block update */
+	int16_t	 s_vinfo[4];	/* device information */
 	s4_daddr s_tfree;	/* total free blocks */
 	s4_ino	 s_tinode;	/* total free inodes */
 	char	 s_fname[6];	/* file system name */
@@ -261,8 +261,8 @@ struct	s4_dfilsys
 } __attribute__((__packed__)) ;
 
 #define	S4_FsMAGIC     0xfd187e20	/* s_magic number */
-#define S4_FsMAGIC_LE  S4_FsMAGIC       /* layed out in order */
-#define S4_FsMAGIC_BE  0x207e18fd       /* layed out reverse  */
+#define S4_FsMAGIC_BE  S4_FsMAGIC       /* layed out in order */
+#define S4_FsMAGIC_LE  0x207e18fd       /* layed out reverse  */
 
 #define	S4_Fs1b	1	/* 512 byte block */
 #define	S4_Fs2b	2	/* 1024 byte block */
@@ -303,7 +303,7 @@ struct	s4_dfilsys
 
 struct	s4_fblk
 {
-	int        df_nfree;
+	int32_t    df_nfree;
 	s4_daddr   df_free[S4_NICFREE];
 };
 
@@ -355,16 +355,16 @@ struct	s4_direct
 /* replace sys/sysmacros.h */
 /* inumber to disk address */
 #ifdef S4_INOSHIFT
-#define	itod(x)	(s4_daddr)(((unsigned)x+(2*S4_INOPB-1))>>S4_INOSHIFT)
+#define	itod(x)	(s4_daddr)(((uint32_t)x+(2*S4_INOPB-1))>>S4_INOSHIFT)
 #else
-#define	itod(x)	(s4_daddr)(((unsigned)x+(2*S4_INOPB-1))/S4_INOPB)
+#define	itod(x)	(s4_daddr)(((uint32_t)x+(2*S4_INOPB-1))/S4_INOPB)
 #endif
 
 /* inumber to disk offset */
 #ifdef S4_INOSHIFT
-#define	itoo(x)	(int)(((unsigned)x+(2*S4_INOPB-1))&(S4_INOPB-1))
+#define	itoo(x)	(s4_off)(((uint32_t)x+(2*S4_INOPB-1))&(S4_INOPB-1))
 #else
-#define	itoo(x)	(int)(((unsigned)x+(2*S4_INOPB-1))%S4_INOPB)
+#define	itoo(x)	(s4_off)(((uint32_t)x+(2*S4_INOPB-1))%S4_INOPB)
 #endif
 
 
@@ -427,7 +427,7 @@ typedef enum
 /* raw filesystem block sizing */
 
 #define S4_NDIRECT (S4_BSIZE/sizeof(struct s4_direct))
-#define S4_SPERB   (S4_BSIZE/sizeof(short))
+#define S4_SPERB   (S4_BSIZE/sizeof(int16_t))
 #define S4_NBB     (512/sizeof(struct s4_bbe))
 
 /* All the blocks we know about in one union */
@@ -444,7 +444,7 @@ typedef union
     /* from the file system */
     struct s4_dinode  dino[ S4_INOPB ];
     struct s4_direct  dir[ S4_NDIRECT ];
-    short             links[ S4_SPERB ];
+    int16_t           links[ S4_SPERB ];
     s4_daddr          indir[ S4_NINDIR ];
     struct s4_dfilsys super;
     struct s4_fblk    free;

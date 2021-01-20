@@ -170,10 +170,20 @@ int	**argv;
 		if (localtime(&timbuf)->tm_isdst)
 			timbuf += -1*60*60;
 
+#ifdef __linux__
+		struct timespec ts;
+		ts.tv_nsec = 0;
+		ts.tv_sec = timbuf;
+		if (clock_settime(CLOCK_REALTIME, &ts) < 0) {
+			tfailed++;
+			(void) fprintf(stderr, "date: no permission\n");
+		}
+#else
 		if(stime(&timbuf) < 0) {
 			tfailed++;
 			(void) fprintf(stderr, "date: no permission\n");
 		} 
+#endif
                 /* s4date: no wtmp/utmp access */
 	}
 	if (tfailed==0)
