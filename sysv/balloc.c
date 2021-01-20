@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  *  linux/fs/sysv/balloc.c
  *
@@ -184,7 +185,6 @@ unsigned long sysv_count_free_blocks(struct super_block * sb)
 	/* this causes a lot of disk traffic ... */
 	count = 0;
 	n = fs16_to_cpu(sbi, *sbi->s_bcache_count);
-
 	blocks = sbi->s_bcache;
 	while (1) {
 		sysv_zone_t zone;
@@ -202,7 +202,6 @@ unsigned long sysv_count_free_blocks(struct super_block * sb)
 
 		if (block < sbi->s_firstdatazone || block >= sbi->s_nzones)
 			goto Einval;
-
 		block += sbi->s_block_base;
 		bh = sb_bread(sb, block);
 		if (!bh)
@@ -226,7 +225,7 @@ Eio:
 	printk("sysv_count_free_blocks: cannot read free-list block\n");
 	goto trust_sb;
 E2big:
-	printk("sysv_count_free_blocks: %d >flc_size %d in free-list block\n", n, sbi->s_flc_size);
+	printk("sysv_count_free_blocks: %d >flc_size entries %d in free-list block\n", n, sbi->s_flc_size);
 	if (bh)
 		brelse(bh);
 trust_sb:
@@ -235,7 +234,7 @@ trust_sb:
 Ecount:
 	printk("sysv_count_free_blocks: free block count was %d, "
 		"correcting to %d\n", sb_count, count);
-	if (!(sb->s_flags & MS_RDONLY)) {
+	if (!sb_rdonly(sb)) {
 		*sbi->s_free_blocks = cpu_to_fs32(sbi, count);
 		dirty_sb(sb);
 	}

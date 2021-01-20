@@ -248,16 +248,16 @@ struct	s4_dfilsys
 	char	 s_ilock;	/* lock during i-list manipulation */
 	char  	 s_fmod; 	/* super block modified flag */
 	char	 s_ronly;	/* mounted read-only flag */
-        int	 s_time; 	/* last super block update */
+        int32_t	 s_time; 	/* last super block update */
 	short	 s_vinfo[4];	/* device information */
 	s4_daddr s_tfree;	/* total free blocks */
 	s4_ino	 s_tinode;	/* total free inodes */
 	char	 s_fname[6];	/* file system name */
 	char	 s_fpack[6];	/* file system pack name */
-	int 	 s_fill[13];	/* ADJUST to make sizeof filsys be 512 */
-	int 	 s_magic;	/* magic number to indicate new file system */
-	int 	 s_type;        /* type of FS S4_Fs1b or S4_Fs2b */
-	int 	 s_fill2[2];	/* pad so sizeof filsys is 512 */
+	int32_t	 s_fill[13];	/* ADJUST to make sizeof filsys be 512 */
+	int32_t	 s_magic;	/* magic number to indicate new file system */
+	int32_t	 s_type;        /* type of FS S4_Fs1b or S4_Fs2b */
+	int32_t	 s_fill2[2];	/* pad so sizeof filsys is 512 */
 } __attribute__((__packed__)) ;
 
 #define	S4_FsMAGIC     0xfd187e20	/* s_magic number */

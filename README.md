@@ -1,7 +1,24 @@
 Fork
 ====
-This is a fork of https://github.com/dad4x/s4-3b1-pc7300 with fixes
-to work with my images of 3b1 disk drives.
+This is a fork of https://github.com/dgesswein/s4-3b1-pc7300,
+which in turn
+is a fork of https://github.com/dad4x/s4-3b1-pc7300, with fixes
+to work with his images of 3b1 disk drives.
+
+So far this fork has updated the `sysv` driver to work on more
+modern Linux systems, in particular on Ubuntu 18.04.  I (Arnold Robbins)
+have added a README.md file there with more information.
+
+NOTE: There is a disconnect between Unix and the `sysv` driver. After
+exporting a filesystem image from a volume image, you must run `s4fsck`
+on it to rebuild the free list. Otherwise, Linux will think there's
+no free space.  After importing such a filesystem, Unix runs a longer
+`fsck` than usual, but things work OK.  I have not tried to track down
+the problem; help with this would be welcome.
+
+Note also that when creating files on a mounted System V filesystem,
+Linux will *not* truncate file names for you; you must keep
+filenames to 14 characters or less.
 
 A fork of my fork is at 
 https://github.com/arnoldrobbins/s4-3b1-pc7300/ that the sysv driver has been
@@ -63,7 +80,3 @@ Modifications to linux to allow mounting of native file system images using
   `mount -t sysv -o loop` *filesystem-image-file* `/mnt/someplace`
 
 merging this to your local linux is out of my current comprehension, but I've gotten it to work with a Debian and a Suse.
-
-
-
-  
