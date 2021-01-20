@@ -1,0 +1,22 @@
+*.o
+sysv/*.cmd
+sysv/modules.order
+sysv/sysv.mod
+sysv/sysv.mod.c
+
+# binaries
+s4date
+s4disk
+s4dump
+s4export
+s4fs
+s4fsck
+s4import
+s4merge
+s4mkfs
+s4test
+s4vol
+libs4.a
+sysv/built-in.a
+sysv/sysv.ko
+
