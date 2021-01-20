@@ -1432,7 +1432,7 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
 
             x = fs->s_free[i];
             printf("%5d, ", x );
-            if( x < 0 || x > 20000 )
+            if( x < 0 || x > fs->s_fsize )
               break;
           }
         printf("\n");
@@ -1444,7 +1444,7 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
               printf("\n    ");
             x = fs->s_inode[i];
             printf("%5d, ", x );
-            if( x < 0 || x > 20000 )
+            if( x < 0 || x > fs->s_fsize )
               break;
           }
         printf("\n");
@@ -1486,7 +1486,7 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
               printf("\n    ");
             x = fsu->indir[i];
             printf("%d, ", x );
-            if( x <= 0 || x > 20000 )
+            if( x <= 0 )
               break;
           }
         printf("  (%d)\n", i);
@@ -1553,8 +1553,8 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
             x = fsu->free.df_free[i];
             printf("%5d, ", x );
 
-            /* sanity checks */
-            if( x < 0 || x > 20000 )
+            /* sanity check */
+            if( x < 0 )
               break;
           }
         printf("  (%d)\n", i);
