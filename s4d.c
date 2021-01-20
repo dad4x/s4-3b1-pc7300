@@ -1128,7 +1128,7 @@ s4err s4_filsys_show( s4_filsys *xfs )
 {
   struct s4_dfilsys *fs = &xfs->super.super;
 
-  if( S4_FsMAGIC_BE == fs->s_magic )
+  if( S4_FsMAGIC_LE == fs->s_magic )
     {
       printf("FS is swapped\n");
       return s4_badmagic;
@@ -1239,7 +1239,7 @@ void s4_fsu_swap( s4_fsu *fsu, int btype )
         for( i = 0; i < 4; i++ )
           fs->s_vinfo[i] = s4swaph( fs->s_vinfo[i] );
 
-        fs->s_time   = s4swapi( fs->s_tfree );
+        fs->s_time   = s4swapi( fs->s_time );
         fs->s_tfree  = s4swapi( fs->s_tfree );
         fs->s_tinode = s4swaph( fs->s_tinode );
         fs->s_type   = s4swapi( fs->s_type );
