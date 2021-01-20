@@ -10,6 +10,10 @@ Check that there isn't a `sysv` module active:
 
     lsmod | grep sysv
 
+If there is, this can be removed with:
+
+    sudo rmmod sysv
+
 Insert your newly-compiled module:
 
     sudo insmod ./sysv.ko
@@ -17,10 +21,6 @@ Insert your newly-compiled module:
 Export a filesystem image from a volume image:
 
     s4export -i hd.img -o hd.fs
-
-Run it through `s4fsck` to repair the free list:
-
-    s4fsck hd.fs
 
 Now you can mount the image:
 
@@ -33,7 +33,9 @@ When done, unmount the filesystem:
     sudo umount /mnt
 
 Use `s4import` to pull the modified filesystem back in to the
-volume image.
+volume image:
+
+    s4import -i hd.fs -o hd.img
 
 #### Last Modified:
-Thu Dec 10 20:21:20 IST 2020
+Tue 19 Jan 2021 11:38:21 PM EST

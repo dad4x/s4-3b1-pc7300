@@ -1292,7 +1292,7 @@ void s4_fsu_swap( s4_fsu *fsu, int btype )
 
     case s4b_free:
       {
-        fsu->free.df_nfree = s4swaph( fsu->free.df_nfree );        
+        fsu->free.df_nfree = s4swapi( fsu->free.df_nfree );
 
         for( i = 0; i < S4_NICFREE; i++ )
             fsu->free.df_free[ i ] = s4swapi( fsu->free.df_free[ i ] );        
@@ -1424,8 +1424,8 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
         if( S4_FsMAGIC != fs->s_magic )
           return;
 
-        printf("  FREE BLOCKS:");
-        for( i = 0; i < S4_NICFREE; i++ )
+        printf("  %d FREE BLOCKS:", fs->s_nfree);
+        for( i = 0; i < S4_NICFREE && i < fs->s_nfree; i++ )
           {
             if(  !(i % 8) )
               printf("\n    ");
@@ -1437,8 +1437,8 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
           }
         printf("\n");
         
-        printf("  FREE INO:");
-        for( i = 0; i < S4_NICINOD; i++ )
+        printf("  %d FREE INO:", fs->s_ninode);
+        for( i = 0; i < S4_NICINOD && i < fs->s_ninode; i++ )
           {
             if( !(i % 8) )
               printf("\n    ");
@@ -1447,7 +1447,7 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
             if( x < 0 || x > 20000 )
               break;
           }
-        printf("  (%d)\n", i);
+        printf("\n");
 
         printf("  DISKINFO:\n");
         for( i = 0; i < 4; i++ )

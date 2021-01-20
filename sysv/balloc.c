@@ -84,7 +84,11 @@ void sysv_free_block(struct super_block * sb, sysv_zone_t nr)
 			return;
 		}
 		memset(bh->b_data, 0, sb->s_blocksize);
-		*(__fs16*)bh->b_data = cpu_to_fs16(sbi, count);
+		/* 3b1 uses 32-bit nfree in a free block, and 16-bit nfree in the superblock */
+		if (sbi->s_type == FSTYPE_CTIX)
+			*(__fs32*)bh->b_data = cpu_to_fs32(sbi, count);
+		else
+			*(__fs16*)bh->b_data = cpu_to_fs16(sbi, count);
 		memcpy(get_chunk(sb,bh), blocks, count * sizeof(sysv_zone_t));
 		mark_buffer_dirty(bh);
 		set_buffer_uptodate(bh);
@@ -136,7 +140,11 @@ sysv_zone_t sysv_new_block(struct super_block * sb)
 			*sbi->s_bcache_count = cpu_to_fs16(sbi, 1);
 			goto Enospc;
 		}
-		count = fs16_to_cpu(sbi, *(__fs16*)bh->b_data);
+		/* 3b1 uses 32-bit nfree in a free block, and 16-bit nfree in the superblock */
+		if (sbi->s_type == FSTYPE_CTIX)
+			count = fs32_to_cpu(sbi, *(__fs32*)bh->b_data);
+		else
+			count = fs16_to_cpu(sbi, *(__fs16*)bh->b_data);
 		if (count > sbi->s_flc_size) {
 		  printk("sysv_new_block: free-list block with %d >flc_size %d entries\n", count, sbi->s_flc_size );
 			brelse(bh);
@@ -206,7 +214,12 @@ unsigned long sysv_count_free_blocks(struct super_block * sb)
 		bh = sb_bread(sb, block);
 		if (!bh)
 			goto Eio;
-		n = fs16_to_cpu(sbi, *(__fs16*)bh->b_data);
+
+		/* 3b1 uses 32-bit nfree in a free block, and 16-bit nfree in the superblock */
+		if (sbi->s_type == FSTYPE_CTIX)
+			n = fs32_to_cpu(sbi, *(__fs32*)bh->b_data);
+		else
+			n = fs16_to_cpu(sbi, *(__fs16*)bh->b_data);
 		blocks = get_chunk(sb, bh);
 	}
 	if (bh)
