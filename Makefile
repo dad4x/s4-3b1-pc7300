@@ -41,7 +41,7 @@ LIBOPTS	= -L. -ls4
 LIBOBJ	= s4d.o 
 
 EXEOBJ	= s4date.o s4disk.o s4dump.o s4export.o s4fs.o s4fsck.o \
-	  s4import.o s4merge.o s4mkfs.o s4test.o s4vol.o
+	  s4import.o s4merge.o s4mkfs.o s4test.o s4vol.o ismounted.o
 
 OBJ	= $(LIBOBJ) $(EXEOBJ)
 
