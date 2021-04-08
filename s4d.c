@@ -1128,7 +1128,7 @@ s4err s4_filsys_show( s4_filsys *xfs )
 {
   struct s4_dfilsys *fs = &xfs->super.super;
 
-  if( S4_FsMAGIC_BE == fs->s_magic )
+  if( S4_FsMAGIC_LE == fs->s_magic )
     {
       printf("FS is swapped\n");
       return s4_badmagic;
@@ -1239,7 +1239,7 @@ void s4_fsu_swap( s4_fsu *fsu, int btype )
         for( i = 0; i < 4; i++ )
           fs->s_vinfo[i] = s4swaph( fs->s_vinfo[i] );
 
-        fs->s_time   = s4swapi( fs->s_tfree );
+        fs->s_time   = s4swapi( fs->s_time );
         fs->s_tfree  = s4swapi( fs->s_tfree );
         fs->s_tinode = s4swaph( fs->s_tinode );
         fs->s_type   = s4swapi( fs->s_type );
@@ -1292,7 +1292,7 @@ void s4_fsu_swap( s4_fsu *fsu, int btype )
 
     case s4b_free:
       {
-        fsu->free.df_nfree = s4swaph( fsu->free.df_nfree );        
+        fsu->free.df_nfree = s4swapi( fsu->free.df_nfree );
 
         for( i = 0; i < S4_NICFREE; i++ )
             fsu->free.df_free[ i ] = s4swapi( fsu->free.df_free[ i ] );        
@@ -1424,30 +1424,30 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
         if( S4_FsMAGIC != fs->s_magic )
           return;
 
-        printf("  FREE BLOCKS:");
-        for( i = 0; i < S4_NICFREE; i++ )
+        printf("  %d FREE BLOCKS:", fs->s_nfree);
+        for( i = 0; i < S4_NICFREE && i < fs->s_nfree; i++ )
           {
             if(  !(i % 8) )
               printf("\n    ");
 
             x = fs->s_free[i];
             printf("%5d, ", x );
-            if( x < 0 || x > 20000 )
+            if( x < 0 || x > fs->s_fsize )
               break;
           }
         printf("\n");
         
-        printf("  FREE INO:");
-        for( i = 0; i < S4_NICINOD; i++ )
+        printf("  %d FREE INO:", fs->s_ninode);
+        for( i = 0; i < S4_NICINOD && i < fs->s_ninode; i++ )
           {
             if( !(i % 8) )
               printf("\n    ");
             x = fs->s_inode[i];
             printf("%5d, ", x );
-            if( x < 0 || x > 20000 )
+            if( x < 0 || x > fs->s_fsize )
               break;
           }
-        printf("  (%d)\n", i);
+        printf("\n");
 
         printf("  DISKINFO:\n");
         for( i = 0; i < 4; i++ )
@@ -1486,7 +1486,7 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
               printf("\n    ");
             x = fsu->indir[i];
             printf("%d, ", x );
-            if( x <= 0 || x > 20000 )
+            if( x <= 0 )
               break;
           }
         printf("  (%d)\n", i);
@@ -1553,8 +1553,8 @@ void s4_fsu_show( s4_fsu *fsu, int btype )
             x = fsu->free.df_free[i];
             printf("%5d, ", x );
 
-            /* sanity checks */
-            if( x < 0 || x > 20000 )
+            /* sanity check */
+            if( x < 0 )
               break;
           }
         printf("  (%d)\n", i);

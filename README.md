@@ -3,10 +3,17 @@ Fork
 This is a fork of https://github.com/dad4x/s4-3b1-pc7300 with fixes
 to work with my images of 3b1 disk drives.
 
+Arnold Robbins has updated the `sysv` driver to work on more
+modern Linux systems, in particular on Ubuntu 18.04. He has
+added a README.md file in the sysv folder with more information.
+
+Note that when creating files on a mounted System V filesystem,
+Linux will *not* truncate file names for you; you must keep
+filenames to 14 characters or less.
+
 A fork of my fork is at 
 https://github.com/arnoldrobbins/s4-3b1-pc7300/ that the sysv driver has been
 updated to work with Ubuntu 18.04.
-
 
 Rest of this is the original readme.
 
@@ -63,7 +70,3 @@ Modifications to linux to allow mounting of native file system images using
   `mount -t sysv -o loop` *filesystem-image-file* `/mnt/someplace`
 
 merging this to your local linux is out of my current comprehension, but I've gotten it to work with a Debian and a Suse.
-
-
-
-  

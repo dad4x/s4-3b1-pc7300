@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0 */
 #ifndef _LINUX_SYSV_FS_H
 #define _LINUX_SYSV_FS_H
 
@@ -6,7 +7,7 @@
 
 #ifndef __KERNEL__
 typedef u16 __fs16;
-typedef u32 __fs16;
+typedef u32 __fs32;
 #endif
 
 /* inode numbers are 16 bit */
